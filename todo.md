@@ -13,3 +13,7 @@
 - [x] Add a context-aware AI-powered chat advisor grounded in curated programme content and user recommendation context.
 - [x] Create server procedures, unit tests, responsive accessibility states, and privacy-preserving browser-session data handling for all core MVP features.
 - [x] Verify scheme output, test key user journeys, inspect the live experience on desktop and mobile, and save the final checkpoint.
+- [x] Replace the downloadable Markdown action plan with a personalised PDF generated in the browser.
+- [x] Remove the SAGE AI Advisor interface and associated server-side AI route.
+- [x] Add a concise founder credibility section that positions Marcus Wong’s relevant public-sector, transformation, and enterprise experience.
+- [x] Re-test the refined experience on desktop and mobile, then save a new validated checkpoint.

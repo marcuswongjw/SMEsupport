@@ -70,6 +70,22 @@ export default function Home() {
             <div className="grid gap-10 lg:grid-cols-[1.2fr_.8fr] lg:items-center"><div><p className="eyebrow text-[#f4be67]">THE TRIPLE-STACK MODEL</p><h2 className="mt-3 font-display text-4xl leading-none tracking-[-.04em] sm:text-5xl">One transformation plan.<br />Three connected levers.</h2><p className="mt-5 max-w-xl leading-7 text-white/68">Technology without process change is expensive. Process change without adoption is fragile. The right sequence brings Digital Foundation, Innovation Acceleration and Workforce Activation together.</p></div><div className="grid gap-3">{[["Digital Foundation", Building2, "Systems, data and proven tools."], ["Innovation Acceleration", Layers3, "Operating-model and market change."], ["Workforce Activation", Compass, "Skills, role redesign and adoption."]].map(([label, Icon, text]) => <div key={String(label)} className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-4"><span className="flex size-10 items-center justify-center rounded-xl bg-white/10 text-[#f4be67]"><Icon className="size-5" /></span><div><p className="font-bold">{String(label)}</p><p className="mt-0.5 text-sm text-white/55">{String(text)}</p></div></div>)}</div></div>
           </div>
         </section>
+
+        <section className="border-y border-[#0b2947]/8 bg-[#eef4f1] py-16">
+          <div className="site-shell grid gap-8 lg:grid-cols-[.85fr_1.15fr] lg:items-center">
+            <div className="rounded-[24px] bg-[#0b2947] p-7 text-white shadow-[0_18px_45px_rgba(11,41,71,.14)] sm:p-9">
+              <p className="eyebrow text-[#f4be67]">CREATED BY MARCUS WONG</p>
+              <p className="mt-4 font-display text-3xl leading-tight tracking-[-.035em]">A practitioner’s perspective on transformation, not a promise of funding.</p>
+              <a href="https://www.linkedin.com/in/marcuswongjw/" target="_blank" rel="noreferrer" className="mt-7 inline-flex items-center gap-2 text-sm font-bold text-[#f4be67] hover:text-white">View LinkedIn profile <ArrowRight className="size-4" /></a>
+            </div>
+            <div className="max-w-2xl">
+              <p className="eyebrow text-[#3f746d]">WHY THIS EXISTS</p>
+              <h2 className="mt-3 font-display text-4xl leading-none tracking-[-.04em]">Guidance shaped by work across policy, enterprise and workforce transformation.</h2>
+              <p className="mt-5 text-base leading-7 text-slate-600">Marcus Wong has more than a decade of experience across Singapore’s public sector, startup ecosystem and higher education. His work has spanned enterprise and incentive programmes at Enterprise Singapore, transformation and manpower initiatives at CAAS, international innovation partnerships at NUS Enterprise, and current work in national AI and workforce development.</p>
+              <p className="mt-4 text-sm leading-6 text-slate-500">SAGE is an independent planning tool informed by that experience. It is not a Government service, does not represent any agency, and does not guarantee scheme eligibility or funding.</p>
+            </div>
+          </div>
+        </section>
       </main>
       <footer className="border-t border-[#0b2947]/8 py-8"><div className="site-shell flex flex-col gap-3 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between"><p>Planning guidance, not a grant approval or official interpretation.</p><p className="font-semibold text-[#0b2947]">SAGE · Singapore SME Support Navigator</p></div></footer>
     </div>
