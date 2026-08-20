@@ -1,0 +1,15 @@
+# Project TODO
+
+- [x] Verify current official scheme terms and translate them into safe recommendation logic for PSG, EDG, MRA, SFEC, WDG, and NAIIP.
+- [x] Define product data models for company profiles, diagnostic responses, recommendation rules, scheme metadata, and downloadable action plans; preserve diagnostic data in browser state for this privacy-first MVP.
+- [x] Build a premium public landing experience and transparent advisory disclaimer.
+- [x] Build the multi-step diagnostic flow for business problems, company profile, sector, and transformation goals.
+- [x] Implement a rules-based recommendation engine with plain-English scheme guidance and eligibility checks.
+- [x] Build the Triple-Stack visualisation using Digital Foundation, Innovation Acceleration, and Workforce Activation verbatim.
+- [x] Add recommendation-specific compliance warnings and suggested sequencing for no retrospective applications, EDG reimbursement, and SFEC expiry deadlines.
+- [x] Create the indicative cost and support calculator with clear assumptions and non-binding output.
+- [x] Add sector-specific pathways for retail, manufacturing, professional services, and F&B using IMDA Industry Digital Plan logic.
+- [x] Build the resource and action hub with official portal links and downloadable personalised 90-day action plans.
+- [x] Add a context-aware AI-powered chat advisor grounded in curated programme content and user recommendation context.
+- [x] Create server procedures, unit tests, responsive accessibility states, and privacy-preserving browser-session data handling for all core MVP features.
+- [x] Verify scheme output, test key user journeys, inspect the live experience on desktop and mobile, and save the final checkpoint.
