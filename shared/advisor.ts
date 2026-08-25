@@ -12,6 +12,11 @@ export type Challenge =
   | "ai-adoption"
   | "cost-pressure";
 
+const schemeChallenges: readonly Challenge[] = [
+  "manual-work", "digital-customer", "process-redesign", "workforce",
+  "overseas-growth", "ai-adoption", "cost-pressure",
+];
+
 export type DiagnosticProfile = {
   challenges: Challenge[];
   sector: Sector;
@@ -42,6 +47,38 @@ export type Recommendation = Scheme & {
   fit: "Strong fit" | "Potential fit" | "Capability pathway";
   rationale: string;
 };
+
+const sectors: readonly Sector[] = ["retail", "manufacturing", "professional-services", "fnb", "other"];
+const companySizes: readonly DiagnosticProfile["companySize"][] = ["micro", "small", "medium", "growth"];
+const revenueBands: readonly DiagnosticProfile["annualRevenue"][] = ["under-1m", "1m-10m", "10m-100m", "over-100m"];
+const shareholdingAnswers: readonly DiagnosticProfile["localShareholding"][] = ["yes", "no", "unsure"];
+const projectStartedAnswers: readonly DiagnosticProfile["projectStarted"][] = ["no", "yes", "unsure"];
+const primaryGoals: readonly DiagnosticProfile["primaryGoal"][] = ["productivity", "growth", "workforce", "market", "ai"];
+
+function includesValue<T extends string>(values: readonly T[], value: unknown): value is T {
+  return typeof value === "string" && values.includes(value as T);
+}
+
+export function sanitizeDiagnosticProfile(value: unknown, fallback: DiagnosticProfile): DiagnosticProfile {
+  if (!value || typeof value !== "object") return fallback;
+  const candidate = value as Record<string, unknown>;
+  const challenges = Array.isArray(candidate.challenges)
+    ? candidate.challenges.filter((item): item is Challenge => includesValue(schemeChallenges, item))
+    : fallback.challenges;
+
+  return {
+    challenges,
+    sector: includesValue(sectors, candidate.sector) ? candidate.sector : fallback.sector,
+    companySize: includesValue(companySizes, candidate.companySize) ? candidate.companySize : fallback.companySize,
+    annualRevenue: includesValue(revenueBands, candidate.annualRevenue) ? candidate.annualRevenue : fallback.annualRevenue,
+    employeeCount: typeof candidate.employeeCount === "number" && Number.isFinite(candidate.employeeCount) && candidate.employeeCount >= 0
+      ? Math.floor(candidate.employeeCount)
+      : fallback.employeeCount,
+    localShareholding: includesValue(shareholdingAnswers, candidate.localShareholding) ? candidate.localShareholding : fallback.localShareholding,
+    projectStarted: includesValue(projectStartedAnswers, candidate.projectStarted) ? candidate.projectStarted : fallback.projectStarted,
+    primaryGoal: includesValue(primaryGoals, candidate.primaryGoal) ? candidate.primaryGoal : fallback.primaryGoal,
+  };
+}
 
 export const stackMeta: Record<StackName, { description: string; eyebrow: string; colour: string }> = {
   "Digital Foundation": {
@@ -243,27 +280,38 @@ function buildRationale(profile: DiagnosticProfile, id: SchemeId): string {
 
 export function getRecommendations(profile: DiagnosticProfile): Recommendation[] {
   const ids = new Set<SchemeId>();
-  if (has(profile, "manual-work") || has(profile, "digital-customer") || has(profile, "cost-pressure") || has(profile, "ai-adoption")) ids.add("PSG");
-  if (has(profile, "process-redesign") || has(profile, "cost-pressure") || profile.primaryGoal === "growth") ids.add("EDG");
-  if (has(profile, "overseas-growth") || profile.primaryGoal === "market") ids.add("MRA");
+  const passesLocalOwnership = profile.localShareholding !== "no";
+  const passesSmeSizeTest = profile.annualRevenue !== "over-100m" || profile.employeeCount <= 200;
+  const canSurfaceSmeGrant = passesLocalOwnership && passesSmeSizeTest;
+  if (canSurfaceSmeGrant && (has(profile, "manual-work") || has(profile, "digital-customer") || has(profile, "cost-pressure") || has(profile, "ai-adoption"))) ids.add("PSG");
+  if (canSurfaceSmeGrant && (has(profile, "process-redesign") || has(profile, "cost-pressure") || profile.primaryGoal === "growth")) ids.add("EDG");
+  if (canSurfaceSmeGrant && (has(profile, "overseas-growth") || profile.primaryGoal === "market")) ids.add("MRA");
   if (has(profile, "workforce") || profile.employeeCount >= 3 || has(profile, "ai-adoption")) ids.add("SFEC");
   if (has(profile, "workforce") || has(profile, "process-redesign") || profile.primaryGoal === "workforce") ids.add("WDG");
   if (has(profile, "ai-adoption") || profile.primaryGoal === "ai") ids.add("NAIIP");
-  if (!ids.size) ids.add("PSG");
+  if (!ids.size && canSurfaceSmeGrant) ids.add("PSG");
   const order: SchemeId[] = ["PSG", "EDG", "MRA", "SFEC", "WDG", "NAIIP"];
   return order
     .filter((id) => ids.has(id))
     .map((id) => ({
       ...schemes[id],
-      fit: id === "NAIIP" ? "Capability pathway" : id === "SFEC" || id === "WDG" ? "Potential fit" : "Strong fit",
+      fit: id === "NAIIP"
+        ? "Capability pathway"
+        : id === "SFEC" || id === "WDG" || profile.localShareholding === "unsure" || profile.projectStarted !== "no"
+          ? "Potential fit"
+          : "Strong fit",
       rationale: buildRationale(profile, id),
     }));
 }
 
 export type CostInputs = { digital: number; transformation: number; market: number; workforce: number };
+export type SfecEligiblePools = { digital: boolean; transformation: boolean; market: false; workforce: boolean };
 export type CostResult = { label: string; gross: number; support: number; net: number; notes: string[] };
 
-export function calculateIndicativeSupport(input: CostInputs): { rows: CostResult[]; totalGross: number; totalSupport: number; totalNet: number; sfecEnterprise: number; sfecWorkforce: number } {
+export function calculateIndicativeSupport(
+  input: CostInputs,
+  sfecEligible: SfecEligiblePools = { digital: false, transformation: false, market: false, workforce: false },
+): { rows: CostResult[]; totalGross: number; totalSupport: number; totalNet: number; sfecEnterprise: number; sfecWorkforce: number } {
   const digital = Math.max(0, input.digital || 0);
   const transformation = Math.max(0, input.transformation || 0);
   const market = Math.max(0, input.market || 0);
@@ -272,9 +320,12 @@ export function calculateIndicativeSupport(input: CostInputs): { rows: CostResul
   const edg = transformation * 0.5;
   const mra = Math.min(market * 0.7, 100000);
   const wdg = Math.min(workforce * 0.7, 150000);
-  const enterpriseResidual = Math.max(0, digital - psg) + Math.max(0, transformation - edg) + Math.max(0, market - mra);
+  const enterpriseResidual =
+    (sfecEligible.digital ? Math.max(0, digital - psg) : 0) +
+    (sfecEligible.transformation ? Math.max(0, transformation - edg) : 0);
   const sfecEnterprise = Math.min(7000, enterpriseResidual * 0.9);
-  const sfecWorkforce = Math.min(Math.max(0, 10000 - sfecEnterprise), Math.max(0, workforce - wdg) * 0.9);
+  const workforceResidual = sfecEligible.workforce ? Math.max(0, workforce - wdg) : 0;
+  const sfecWorkforce = Math.min(Math.max(0, 10000 - sfecEnterprise), workforceResidual * 0.9);
   const rows: CostResult[] = [
     { label: "Digital Foundation", gross: digital, support: psg, net: Math.max(0, digital - psg), notes: ["PSG estimate: 50% of cost, capped at S$30,000."] },
     { label: "Innovation Acceleration", gross: transformation, support: edg, net: Math.max(0, transformation - edg), notes: ["EDG estimate: 50% of cost; actual rate and costs require confirmation."] },
