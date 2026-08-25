@@ -21,3 +21,4 @@
 - [x] Configure a static GitHub Pages build and deployment workflow for the SAGE application.
 - [x] Validate the static production build and push the source to the public repository.
 - [ ] Enable GitHub Pages using the GitHub Actions source in repository settings; owner permission is required because the connected token was denied Pages administration access.
+- [x] Fix the GitHub Pages workflow setup order so pnpm is available before dependency-cache initialisation.
