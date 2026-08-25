@@ -17,6 +17,7 @@
 - [x] Remove the SAGE AI Advisor interface and associated server-side AI route.
 - [x] Add a concise founder credibility section that positions Marcus Wong’s relevant public-sector, transformation, and enterprise experience.
 - [x] Re-test the refined experience on desktop and mobile, then save a new validated checkpoint.
-- [ ] Create the public SMEsupport GitHub repository under the connected account.
-- [ ] Configure a static GitHub Pages build and deployment workflow for the SAGE application.
-- [ ] Validate the static production build, push the source, and provide the repository and Pages details.
+- [x] Create the public SMEsupport GitHub repository under the connected account.
+- [x] Configure a static GitHub Pages build and deployment workflow for the SAGE application.
+- [x] Validate the static production build and push the source to the public repository.
+- [ ] Enable GitHub Pages using the GitHub Actions source in repository settings; owner permission is required because the connected token was denied Pages administration access.
