@@ -1,5 +1,10 @@
 import { jsPDF } from "jspdf";
-import { sectorPathways, type DiagnosticProfile, type Recommendation } from "@shared/advisor";
+import {
+  officialDataAsOf,
+  sectorPathways,
+  type DiagnosticProfile,
+  type Recommendation,
+} from "@shared/advisor";
 
 type PdfInput = {
   profile: DiagnosticProfile;
@@ -10,7 +15,14 @@ type PdfInput = {
   challengeLabels: string[];
 };
 
-export function downloadActionPlanPdf({ profile, recommendations, compliance, sequence, goalLabel, challengeLabels }: PdfInput) {
+export function downloadActionPlanPdf({
+  profile,
+  recommendations,
+  compliance,
+  sequence,
+  goalLabel,
+  challengeLabels,
+}: PdfInput) {
   const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
@@ -23,7 +35,12 @@ export function downloadActionPlanPdf({ profile, recommendations, compliance, se
     pdf.addPage();
     y = 18;
   };
-  const paragraph = (text: string, size = 9.5, colour: [number, number, number] = [71, 84, 96], spacing = 5.2) => {
+  const paragraph = (
+    text: string,
+    size = 9.5,
+    colour: [number, number, number] = [71, 84, 96],
+    spacing = 5.2
+  ) => {
     pdf.setFont("helvetica", "normal");
     pdf.setFontSize(size);
     pdf.setTextColor(...colour);
@@ -70,33 +87,58 @@ export function downloadActionPlanPdf({ profile, recommendations, compliance, se
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(9);
   pdf.setTextColor(213, 227, 224);
-  pdf.text(`Generated ${new Date().toLocaleDateString("en-SG", { day: "numeric", month: "long", year: "numeric" })}`, margin, 38);
+  pdf.text(
+    `Generated ${new Date().toLocaleDateString("en-SG", { day: "numeric", month: "long", year: "numeric" })}`,
+    margin,
+    38
+  );
   y = 60;
 
   section("YOUR TRANSFORMATION BRIEF", "The business outcome to focus on");
-  paragraph(`${sectorPathways[profile.sector].focus} Your stated primary goal is to ${goalLabel.toLowerCase()}.`);
+  paragraph(
+    `${sectorPathways[profile.sector].focus} Your stated primary goal is to ${goalLabel.toLowerCase()}.`
+  );
   bullet("Sector", sectorPathways[profile.sector].label);
   bullet("Business priorities", challengeLabels.join("; ") || "Not specified");
-  bullet("Likely support pathways", recommendations.map((item) => `${item.id} — ${item.name}`).join("; "));
+  bullet(
+    "Likely support pathways",
+    recommendations.map(item => `${item.id} — ${item.name}`).join("; ")
+  );
 
   section("DAYS 1–15", "Diagnose and protect eligibility");
-  paragraph("Confirm one business constraint and establish a baseline measure. Assign a business owner, workforce lead and evidence owner. Review the relevant Industry Digital Plan and official scheme pages before engaging a provider.");
+  paragraph(
+    "Confirm one business constraint and establish a baseline measure. Assign a business owner, workforce lead and evidence owner. Review the relevant Industry Digital Plan and official scheme pages before engaging a provider."
+  );
   section("DAYS 16–30", "Design one integrated transformation plan");
-  paragraph("Separate the cost pools for Digital Foundation, Innovation Acceleration and Workforce Activation. Prepare a clear project brief, compliant quotations and a workforce impact plan. Do not create overlapping claims for the same invoice or cost item.");
+  paragraph(
+    "Separate the cost pools for Digital Foundation, Innovation Acceleration and Workforce Activation. Prepare a clear project brief, compliant quotations and a workforce impact plan. Do not create overlapping claims for the same invoice or cost item."
+  );
   section("DAYS 31–60", "Verify live terms and submit ready applications");
-  paragraph("Check every live eligibility requirement, eligible cost, provider status, course route and funding condition. Submit only the components that are ready. Ensure the intended activity has not started if the scheme prohibits retrospective applications.");
+  paragraph(
+    "Check every live eligibility requirement, eligible cost, provider status, course route and funding condition. Submit only the components that are ready. Ensure the intended activity has not started if the scheme prohibits retrospective applications."
+  );
   section("DAYS 61–90", "Mobilise, evidence and measure");
-  paragraph("Begin only activities permitted under the relevant application or Letter of Offer. Track quotations, contracts, invoices, payment evidence, delivery records, staff participation and before-and-after outcome measures as the work happens.");
+  paragraph(
+    "Begin only activities permitted under the relevant application or Letter of Offer. Track quotations, contracts, invoices, payment evidence, delivery records, staff participation and before-and-after outcome measures as the work happens."
+  );
 
   section("SUGGESTED SEQUENCE", "Move through the work in a controlled order");
-  sequence.forEach((item) => bullet(`${item.step} ${item.title}`, item.detail));
+  sequence.forEach(item => bullet(`${item.step} ${item.title}`, item.detail));
 
   section("COMPLIANCE CHECKPOINTS", "What to verify before committing");
-  compliance.forEach((item) => bullet(item.scheme, item.rule));
+  compliance.forEach(item => bullet(item.scheme, item.rule));
 
   section("IMPORTANT", "Use this as a planning aid");
-  paragraph("This personalised plan is not a grant approval, legal opinion or official interpretation. Grant criteria, funding levels, programme availability and claim requirements can change. Verify the current official scheme page and the terms of any Letter of Offer before signing a contract, making payment or commencing work.", 8.7, [112, 85, 29]);
-  paragraph("Official starting points: Business Grants Portal (BGP), EnterpriseSG, SkillsFuture for Business, and IMDA SMEs Go Digital.", 8.7, [71, 84, 96]);
+  paragraph(
+    `This personalised plan is not a grant approval, legal opinion or official interpretation. The programme information used by SAGE was verified against official Government sources on ${officialDataAsOf}; grant criteria, funding levels, programme availability and claim requirements can change. Verify the current official scheme page and the terms of any Letter of Offer before signing a contract, making payment or commencing work.`,
+    8.7,
+    [112, 85, 29]
+  );
+  paragraph(
+    "Official starting points: Business Grants Portal (BGP), EnterpriseSG, SkillsFuture for Business, and IMDA SMEs Go Digital.",
+    8.7,
+    [71, 84, 96]
+  );
 
   const fileName = `SAGE-90-Day-Transformation-Plan-${sectorPathways[profile.sector].label.replace(/\s+/g, "-")}.pdf`;
   pdf.save(fileName);
