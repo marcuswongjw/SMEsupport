@@ -153,7 +153,9 @@ function vitePluginManusDebugCollector(): Plugin {
 const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime(), vitePluginManusDebugCollector()];
 
 export default defineConfig({
-  base: process.env.GITHUB_ACTIONS ? "/SMEsupport/" : "/",
+  // Relative asset URLs work both at the project path on github.io and at the
+  // root of a GitHub Pages custom domain.
+  base: "./",
   plugins,
   resolve: {
     alias: {
